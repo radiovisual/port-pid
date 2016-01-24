@@ -1,0 +1,45 @@
+{
+  "name": "port-pid",
+  "version": "0.0.0",
+  "description": "Get the pid(s) of a process on a given port",
+  "license": "MIT",
+  "repository": "radiovisual/port-pid",
+  "author": {
+    "name": "Michael Wuergler",
+    "email": "wuergler@gmail.com",
+    "url": "numetriclabs.com"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "xo && ava --verbose"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "netstat",
+    "lsof",
+    "net",
+    "stat",
+    "port",
+    "tcp",
+    "udp",
+    "activity",
+    "pid",
+    "pids"
+  ],
+  "dependencies": {
+    "native-promise-only": "^0.8.1",
+    "netstats": "0.0.2"
+  },
+  "devDependencies": {
+    "array-unique": "^0.2.1",
+    "ava": "^0.8.0",
+    "xo": "^0.12.1"
+  },
+  "ava": {
+    "verbose": true
+  }
+}
