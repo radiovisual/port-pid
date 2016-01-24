@@ -32,11 +32,13 @@
   ],
   "dependencies": {
     "native-promise-only": "^0.8.1",
-    "netstats": "0.0.2"
+    "netstats": "0.0.2",
+    "selective-whitespace": "^1.0.0"
   },
   "devDependencies": {
     "array-unique": "^0.2.1",
     "ava": "^0.8.0",
+    "express": "^4.13.4",
     "xo": "^0.12.1"
   },
   "ava": {
