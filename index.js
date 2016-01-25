@@ -41,10 +41,6 @@ function process(arr) {
 		var values = condense(item).split(' ');
 		var pid = parseInt(values[pidindex], 10);
 
-		console.log('item ', item);
-		console.log('values: ', values);
-		console.log('pid;', pid);
-
 		if (platform === 'win32') {
 			pid = values.pop();
 		}

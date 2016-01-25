@@ -1,6 +1,6 @@
 {
   "name": "port-pid",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Get the pid(s) of a process on a given port",
   "license": "MIT",
   "repository": "radiovisual/port-pid",
