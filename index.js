@@ -3,7 +3,6 @@ var condense = require('selective-whitespace');
 var eachAsync = require('each-async');
 var netstats = require('netstats');
 var platform = process.platform;
-
 require('native-promise-only');
 
 var pids = {
@@ -22,7 +21,6 @@ module.exports = function (port, opts) {
 	return new Promise(function (resolve) {
 		netstats(port).then(function (stats) {
 			process(stats).then(function (ps) {
-				console.log(ps);
 				resolve(ps);
 			});
 		});
@@ -37,29 +35,31 @@ function process(arr) {
 		items = arr;
 	}
 
-	eachAsync(items, function (item, index, done) {
-		var values = condense(item).split(' ');
-		var pid = parseInt(values[pidindex], 10);
+	return new Promise(function (resolve, reject) {
+		eachAsync(items, function (item, index, done) {
+			var values = condense(item).split(' ');
+			var pid = parseInt(values[pidindex], 10);
 
-		if (platform === 'win32') {
-			pid = values.pop();
-		}
-
-		if (values.length > 1) {
-			if (values.indexOf('TCP') !== -1) {
-				pushTo(pids.tcp, pid);
-				pushTo(pids.all, pid);
-			} else if (values.indexOf('UDP') !== -1) {
-				pushTo(pids.udp, pid);
-				pushTo(pids.all, pid);
+			if (platform === 'win32') {
+				pid = values.pop();
 			}
-		}
-		done();
-	}, function (err) {
-		if (err) {
-			Promise.reject(err);
-		}
-		Promise.resolve(pids);
+
+			if (values.length > 1) {
+				if (values.indexOf('TCP') !== -1) {
+					pushTo(pids.tcp, pid);
+					pushTo(pids.all, pid);
+				} else if (values.indexOf('UDP') !== -1) {
+					pushTo(pids.udp, pid);
+					pushTo(pids.all, pid);
+				}
+			}
+			done();
+		}, function (err) {
+			if (err) {
+				reject(err);
+			}
+			resolve(pids);
+		});
 	});
 }
 
