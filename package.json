@@ -32,7 +32,7 @@
   ],
   "dependencies": {
     "native-promise-only": "^0.8.1",
-    "netstats": "0.0.2",
+    "netstats": "0.0.5",
     "selective-whitespace": "^1.0.0"
   },
   "devDependencies": {
