@@ -1,6 +1,6 @@
 {
   "name": "port-pid",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Get the pid(s) of a process on a given port",
   "license": "MIT",
   "repository": "radiovisual/port-pid",
@@ -31,6 +31,7 @@
     "pids"
   ],
   "dependencies": {
+    "each-async": "^1.1.1",
     "native-promise-only": "^0.8.1",
     "netstats": "0.0.5",
     "selective-whitespace": "^1.0.0"
@@ -44,8 +45,8 @@
   "ava": {
     "verbose": true
   },
-  "xo" : {
-    "rules" : {
+  "xo": {
+    "rules": {
       "linebreak-style": 0
     }
   }

@@ -1,5 +1,5 @@
 import test from 'ava';
-import portpids from './';
+import portpids from './index.js';
 const server = require('express')();
 import arrayUnique from 'array-unique';
 
@@ -17,7 +17,7 @@ test('expect a port number', t => {
 });
 
 test('returns arrays', async t => {
-	await portpids(t.context.port).then(pids => {
+	portpids(t.context.port).then(pids => {
 		t.plan(3);
 		t.true(Array.isArray(pids.all));
 		t.true(Array.isArray(pids.tcp));
@@ -26,7 +26,7 @@ test('returns arrays', async t => {
 });
 
 test('gets the pids', async t => {
-	await portpids(t.context.port).then(pids => {
+	portpids(t.context.port).then(pids => {
 		t.plan(4);
 
 		t.true(pids.all.length > 0);
@@ -37,7 +37,7 @@ test('gets the pids', async t => {
 });
 
 test('doesnt push duplicate entries', async t => {
-	await portpids(t.context.port).then(pids => {
+	portpids(t.context.port).then(pids => {
 		t.plan(3);
 
 		t.is(pids.all, arrayUnique(pids.all));

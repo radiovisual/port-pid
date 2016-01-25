@@ -1,5 +1,6 @@
 'use strict';
 var condense = require('selective-whitespace');
+var eachAsync = require('each-async');
 var netstats = require('netstats');
 var platform = process.platform;
 
@@ -29,36 +30,45 @@ module.exports = function (port, opts) {
 };
 
 function process(arr) {
-	return new Promise(function (resolve) {
-		// darwin defaults: ignore the first line on mac, it doesn't have any pid data
-		var pidindex = 1;
-		var items = arr.slice(1);
+	var pidindex = 1;
+	var items = arr.slice(1);
+
+	if (platform === 'win32') {
+		items = arr;
+	}
+
+	eachAsync(items, function (item, index, done) {
+		var values = condense(item).split(' ');
+		var pid = parseInt(values[pidindex], 10);
+
+		console.log('item ', item);
+		console.log('values: ', values);
+		console.log('pid;', pid);
 
 		if (platform === 'win32') {
-			items = arr;
+			pid = values.pop();
 		}
 
-		items.map(function (item) {
-			var values = condense(item).split(' ');
-			var pid = parseInt(values[pidindex], 10);
-
-			if (platform === 'win32') {
-				pid = values.pop();
-			}
-
+		if (values.length > 1) {
 			if (values.indexOf('TCP') !== -1) {
 				pushTo(pids.tcp, pid);
+				pushTo(pids.all, pid);
 			} else if (values.indexOf('UDP') !== -1) {
 				pushTo(pids.udp, pid);
+				pushTo(pids.all, pid);
 			}
-			pushTo(pids.all, pid);
-			resolve(pids);
-		});
+		}
+		done();
+	}, function (err) {
+		if (err) {
+			Promise.reject(err);
+		}
+		Promise.resolve(pids);
 	});
 }
 
 function pushTo(target, item) {
-	if (item !== '' && item !== 0 && target.indexOf(item) === -1) {
+	if (item !== '' && !isNaN(item) && item !== 0 && target.indexOf(item) === -1) {
 		target.push(item);
 	}
 }
@@ -71,7 +81,7 @@ function pushTo(target, item) {
  nc      20661 michael    3u  IPv4 0x3b190d9d07c2c3db      0t0  TCP *:8017 (LISTEN)
  nc      21145 michael    3u  IPv4 0x3b190d9d054773db      0t0  TCP *:8017 (LISTEN)
  Python  21221 michael    3u  IPv4 0x3b190d9ceb8dfd7b      0t0  UDP localhost:8017
-*/
+ */
 
 // [WIN] $ netstat.exe -a -n -o | findstr :9000
 
@@ -84,4 +94,4 @@ function pushTo(target, item) {
  TCP    127.0.0.1:62376        127.0.0.1:9000         ESTABLISHED     7604
  TCP    127.0.0.1:62378        127.0.0.1:9000         ESTABLISHED     7604
  UDP    127.0.0.1:9000         *:*                                    1240
-*/
+ */
