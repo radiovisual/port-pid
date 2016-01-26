@@ -46,6 +46,16 @@ test('doesnt push duplicate entries', async t => {
 	});
 });
 
+test('returns empty objects on error', async t => {
+	portpids(-1).then(pids => {
+		t.plan(3);
+
+		t.true(Array.isArray(pids.all) && pids.all.length === 0);
+		t.true(Array.isArray(pids.tcp) && pids.tcp.length === 0);
+		t.true(Array.isArray(pids.udp) && pids.udp.length === 0);
+	});
+});
+
 test.afterEach(t => {
 	t.context.listener.close();
 	console.log('closing test server on port: ', t.context.port);

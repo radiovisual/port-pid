@@ -23,6 +23,8 @@ module.exports = function (port, opts) {
 			process(stats).then(function (ps) {
 				resolve(ps);
 			});
+		}).catch(function () {
+			resolve(pids);
 		});
 	});
 };
