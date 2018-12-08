@@ -20,7 +20,7 @@ module.exports = function (port, opts) {
 
 	return new Promise(function (resolve) {
 		netstats(port).then(function (stats) {
-			process(stats).then(function (ps) {
+			processNetStats(stats).then(function (ps) {
 				resolve(ps);
 			});
 		}).catch(function () {
@@ -29,7 +29,7 @@ module.exports = function (port, opts) {
 	});
 };
 
-function process(arr) {
+function processNetStats(arr) {
 	var pidindex = 1;
 	var items = arr.slice(1);
 
