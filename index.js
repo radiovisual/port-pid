@@ -1,16 +1,9 @@
 
 /* eslint prefer-destructuring: 0 */
 const condense = require('selective-whitespace');
-const eachAsync = require('each-async');
 const netstats = require('netstats');
 
 const platform = process.platform;
-
-const pids = {
-  all: [],
-  tcp: [],
-  udp: [],
-};
 
 function pushTo(target, item) {
   if (item !== '' && typeof item === 'number' && item !== 0 && target.indexOf(item) === -1) {
@@ -18,9 +11,7 @@ function pushTo(target, item) {
   }
 }
 
-
 // Example output to parse (macOS):
-
 // $ lsof -i :8017
 /*
  COMMAND   PID    USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
@@ -42,7 +33,7 @@ function pushTo(target, item) {
  UDP    127.0.0.1:9000         *:*                                    1240
  */
 
-function processNetStats(arr) {
+async function processNetStats(arr) {
   const pidindex = 1;
   let items = arr.slice(1);
 
@@ -50,32 +41,34 @@ function processNetStats(arr) {
     items = arr;
   }
 
-  return new Promise(((resolve, reject) => {
-    eachAsync(items, (item, index, done) => {
-      const values = condense(item).split(' ');
-      let pid = parseInt(values[pidindex], 10);
+  const pids = {
+    all: [],
+    tcp: [],
+    udp: [],
+  };
 
-      if (platform === 'win32') {
-        pid = values.pop();
-      }
+  await Promise.all(items.map((item) => {
+    const values = condense(item).split(' ');
+    let pid = parseInt(values[pidindex], 10);
 
-      if (values.length > 1) {
-        if (values.indexOf('TCP') !== -1) {
-          pushTo(pids.tcp, pid);
-          pushTo(pids.all, pid);
-        } else if (values.indexOf('UDP') !== -1) {
-          pushTo(pids.udp, pid);
-          pushTo(pids.all, pid);
-        }
+    if (platform === 'win32') {
+      pid = values.pop();
+    }
+
+    if (values.length > 1) {
+      if (values.indexOf('TCP') !== -1) {
+        pushTo(pids.tcp, pid);
+        pushTo(pids.all, pid);
+      } else if (values.indexOf('UDP') !== -1) {
+        pushTo(pids.udp, pid);
+        pushTo(pids.all, pid);
       }
-      done();
-    }, (err) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(pids);
-    });
+    }
+
+    return Promise.resolve();
   }));
+
+  return pids;
 }
 
 function main(port) {
@@ -89,7 +82,11 @@ function main(port) {
         resolve(ps);
       });
     }).catch(() => {
-      resolve(pids);
+      resolve({
+        all: [],
+        tcp: [],
+        udp: [],
+      });
     });
   }));
 }
