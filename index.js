@@ -1,79 +1,27 @@
-'use strict';
-var condense = require('selective-whitespace');
-var eachAsync = require('each-async');
-var netstats = require('netstats');
-var platform = process.platform;
-require('native-promise-only');
 
-var pids = {
-	all: [],
-	tcp: [],
-	udp: []
+/* eslint prefer-destructuring: 0 */
+const condense = require('selective-whitespace');
+const eachAsync = require('each-async');
+const netstats = require('netstats');
+
+const platform = process.platform;
+
+const pids = {
+  all: [],
+  tcp: [],
+  udp: [],
 };
-
-module.exports = function (port, opts) {
-	if (typeof port !== 'number') {
-		throw new TypeError('Expected a port number');
-	}
-
-	opts = opts || {};
-
-	return new Promise(function (resolve) {
-		netstats(port).then(function (stats) {
-			process(stats).then(function (ps) {
-				resolve(ps);
-			});
-		}).catch(function () {
-			resolve(pids);
-		});
-	});
-};
-
-function process(arr) {
-	var pidindex = 1;
-	var items = arr.slice(1);
-
-	if (platform === 'win32') {
-		items = arr;
-	}
-
-	return new Promise(function (resolve, reject) {
-		eachAsync(items, function (item, index, done) {
-			var values = condense(item).split(' ');
-			var pid = parseInt(values[pidindex], 10);
-
-			if (platform === 'win32') {
-				pid = values.pop();
-			}
-
-			if (values.length > 1) {
-				if (values.indexOf('TCP') !== -1) {
-					pushTo(pids.tcp, pid);
-					pushTo(pids.all, pid);
-				} else if (values.indexOf('UDP') !== -1) {
-					pushTo(pids.udp, pid);
-					pushTo(pids.all, pid);
-				}
-			}
-			done();
-		}, function (err) {
-			if (err) {
-				reject(err);
-			}
-			resolve(pids);
-		});
-	});
-}
 
 function pushTo(target, item) {
-	if (item !== '' && !isNaN(item) && item !== 0 && target.indexOf(item) === -1) {
-		target.push(item);
-	}
+  if (item !== '' && typeof item === 'number' && item !== 0 && target.indexOf(item) === -1) {
+    target.push(item);
+  }
 }
 
-// Example output to parse:
 
-// [MAC] $ lsof -i :8017
+// Example output to parse (macOS):
+
+// $ lsof -i :8017
 /*
  COMMAND   PID    USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
  nc      20661 michael    3u  IPv4 0x3b190d9d07c2c3db      0t0  TCP *:8017 (LISTEN)
@@ -93,3 +41,57 @@ function pushTo(target, item) {
  TCP    127.0.0.1:62378        127.0.0.1:9000         ESTABLISHED     7604
  UDP    127.0.0.1:9000         *:*                                    1240
  */
+
+function processNetStats(arr) {
+  const pidindex = 1;
+  let items = arr.slice(1);
+
+  if (platform === 'win32') {
+    items = arr;
+  }
+
+  return new Promise(((resolve, reject) => {
+    eachAsync(items, (item, index, done) => {
+      const values = condense(item).split(' ');
+      let pid = parseInt(values[pidindex], 10);
+
+      if (platform === 'win32') {
+        pid = values.pop();
+      }
+
+      if (values.length > 1) {
+        if (values.indexOf('TCP') !== -1) {
+          pushTo(pids.tcp, pid);
+          pushTo(pids.all, pid);
+        } else if (values.indexOf('UDP') !== -1) {
+          pushTo(pids.udp, pid);
+          pushTo(pids.all, pid);
+        }
+      }
+      done();
+    }, (err) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(pids);
+    });
+  }));
+}
+
+function main(port) {
+  if (typeof port !== 'number') {
+    throw new TypeError('Expected a port number');
+  }
+
+  return new Promise(((resolve) => {
+    netstats(port).then((stats) => {
+      processNetStats(stats).then((ps) => {
+        resolve(ps);
+      });
+    }).catch(() => {
+      resolve(pids);
+    });
+  }));
+}
+
+module.exports = main;

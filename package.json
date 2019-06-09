@@ -7,13 +7,13 @@
   "author": {
     "name": "Michael Wuergler",
     "email": "wuergler@gmail.com",
-    "url": "numetriclabs.com"
+    "url": "https://github.com/radiovisual"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=8"
   },
   "scripts": {
-    "test": "xo && ava --verbose"
+    "test": "eslint index.js test.js && jest"
   },
   "files": [
     "index.js"
@@ -33,21 +33,18 @@
   "dependencies": {
     "each-async": "^1.1.1",
     "native-promise-only": "^0.8.1",
-    "netstats": "0.0.5",
+    "netstats": "0.0.6",
     "selective-whitespace": "^1.0.0"
   },
   "devDependencies": {
     "array-unique": "^0.2.1",
-    "ava": "^0.8.0",
-    "express": "^4.13.4",
-    "xo": "^0.12.1"
-  },
-  "ava": {
-    "verbose": true
-  },
-  "xo": {
-    "rules": {
-      "linebreak-style": 0
-    }
+    "eslint": "^5.3.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-jest": "^22.6.4",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.13.0",
+    "express": "^4.17.1",
+    "jest": "^24.8.0"
   }
 }
