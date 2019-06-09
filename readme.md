@@ -1,9 +1,6 @@
-# port-pid 
+# port-pid [![Build Status](https://travis-ci.org/radiovisual/port-pid.svg?branch=master)](https://travis-ci.org/radiovisual/port-pid)
 
 > Get the pid(s) of the process on a given port.
-
-[![Build Status](https://travis-ci.org/radiovisual/port-pid.svg?branch=master)](https://travis-ci.org/radiovisual/port-pid)
-
 
 ## Install
 
@@ -31,7 +28,6 @@ pids(8017).then(pids => {
 });
 ```
 
-
 ## License
 
-MIT © [Michael Wuergler](http://numetriclabs.com)
+MIT © [Michael Wuergler](https://github.com/radiovisual)
