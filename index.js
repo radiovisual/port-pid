@@ -52,7 +52,7 @@ async function processNetStats(arr) {
     let pid = parseInt(values[pidindex], 10);
 
     if (platform === 'win32') {
-      pid = values.pop();
+      pid = parseInt(values.pop(), 10);
     }
 
     if (values.length > 1) {
